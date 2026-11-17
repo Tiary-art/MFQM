@@ -1,0 +1,53 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '6.0.24'
+}
+
+version = mod_version
+group = mod_group_id
+base { archivesName = 'mfqm-reborn' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    copyIdeResources = true
+    runs {
+        configureEach {
+            workingDirectory project.file("run/${name}")
+            property 'forge.logging.console.level', 'info'
+            property 'forge.enabledGameTestNamespaces', mod_id
+            mods { mfqm { source sourceSets.main } }
+        }
+        client { }
+        server { args '--nogui' }
+        gameTestServer { }
+    }
+}
+
+dependencies { minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}" }
+
+tasks.named('processResources', ProcessResources).configure {
+    inputs.property 'mod_version', mod_version
+    filesMatching('META-INF/mods.toml') { expand mod_version: mod_version }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+tasks.named('jar', Jar).configure {
+    manifest { attributes('Implementation-Title': 'More Fun Quicksand Reborn', 'Implementation-Version': mod_version) }
+    finalizedBy 'reobfJar'
+}
+
+// Forward console commands (including stop) to the development dedicated server.
+tasks.withType(JavaExec).configureEach {
+    if (name == 'runServer') { standardInput = System.in }
+}
