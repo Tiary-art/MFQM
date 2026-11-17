@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[47,48)"
+license="All Rights Reserved"
+[[mods]]
+modId="mfqm"
+version="${mod_version}"
+displayName="More Fun Quicksand Reborn"
+authors="MFQM Reborn project"
+description='''Task 002 development foundation. Includes a solid development test block, not ported quicksand physics. Uses Minecraft's own sand texture; no legacy MFQM artwork is bundled.'''
+[[dependencies.mfqm]]
+modId="forge"
+mandatory=true
+versionRange="[47.2.0,48)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.mfqm]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1]"
+ordering="NONE"
+side="BOTH"
