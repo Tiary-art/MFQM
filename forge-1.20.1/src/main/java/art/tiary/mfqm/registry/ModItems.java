@@ -19,5 +19,14 @@ public final class ModItems {
     public static final RegistryObject<Item> SOFT_QUICKSAND = ITEMS.register("soft_quicksand",
             () -> new BlockItem(ModBlocks.SOFT_QUICKSAND.get(), new Item.Properties()));
 
+    public static final java.util.Map<String, RegistryObject<Item>> LEGACY = new java.util.LinkedHashMap<>();
+    static {
+        LEGACY.put("quicksand",QUICKSAND); LEGACY.put("mud",MUD); LEGACY.put("soft_quicksand",SOFT_QUICKSAND);
+        for (var spec : art.tiary.mfqm.content.LegacyCatalog.ALL) if (!LEGACY.containsKey(spec.id()))
+            LEGACY.put(spec.id(), ITEMS.register(spec.id(), () -> spec.kind() == art.tiary.mfqm.content.LegacyCatalog.Kind.LILY
+                ? new net.minecraft.world.item.PlaceOnWaterBlockItem(ModBlocks.LEGACY.get(spec.id()).get(),new Item.Properties())
+                : new BlockItem(ModBlocks.LEGACY.get(spec.id()).get(),new Item.Properties())));
+    }
+
     private ModItems() { }
 }

@@ -7,9 +7,9 @@ public final class SinkConfig {
     public static final ForgeConfigSpec.BooleanValue PLAYER_OXYGEN;
     public static final ForgeConfigSpec.BooleanValue MOB_OXYGEN;
     public static final ForgeConfigSpec.DoubleValue DAMAGE_MULTIPLIER;
-    public static final ForgeConfigSpec.DoubleValue ENTRY_DEPTH, TERMINAL, DEPTH_GAIN;
+    public static final ForgeConfigSpec.DoubleValue ENTRY_DEPTH, TERMINAL, DEPTH_GAIN, QS_BASE, MUD_BASE, SOFT_BASE, MOVING_EXTRA, STRUGGLE_EXTRA, ENTRY_DAMPING;
     public static MotionMath.Policy motionPolicy() {
-        return new MotionMath.Policy(ENTRY_DEPTH.get(), TERMINAL.get(), DEPTH_GAIN.get());
+        return new MotionMath.Policy(ENTRY_DEPTH.get(), TERMINAL.get(), DEPTH_GAIN.get(), QS_BASE.get(), MUD_BASE.get(), SOFT_BASE.get(), MOVING_EXTRA.get(), STRUGGLE_EXTRA.get(), ENTRY_DAMPING.get());
     }
     static {
         var builder = new ForgeConfigSpec.Builder();
@@ -17,12 +17,24 @@ public final class SinkConfig {
                 .define("playerOxygen", true);
         MOB_OXYGEN = builder.define("mobOxygen", true);
         DAMAGE_MULTIPLIER = builder.defineInRange("drowningDamageMultiplier", 1.0, 0.0, 100.0);
+        // Preserve B1 keys on existing worlds, but do not silently reuse their fast defaults.
         builder.push("motionCandidate");
-        ENTRY_DEPTH = builder.comment("B1 candidate; blocks of first-step penetration, pending gameplay approval.")
+        builder.comment("Deprecated B1 settings, retained for configuration migration only.").defineInRange("entryDepth", .08, .01, .2);
+        builder.defineInRange("terminalDescent", .055, .02, .1);
+        builder.defineInRange("depthGain", .020, 0, .05);
+        builder.pop();
+        builder.push("motionV2");
+        ENTRY_DEPTH = builder.comment("Blocks of first-step penetration; separate from continuous sinking.")
                 .defineInRange("entryDepth", 0.08, 0.01, 0.2);
         TERMINAL = builder.comment("Maximum continuous descent in blocks/game tick; not legacy parity.")
-                .defineInRange("terminalDescent", 0.055, 0.02, 0.1);
-        DEPTH_GAIN = builder.defineInRange("depthGain", 0.020, 0.0, 0.05);
+                .defineInRange("terminalDescent", 0.012, 0.001, 0.1);
+        DEPTH_GAIN = builder.defineInRange("depthGain", 0.004, 0.0, 0.05);
+        QS_BASE = builder.defineInRange("quicksandBase", .0055, .001, .05);
+        MUD_BASE = builder.defineInRange("mudBase", .0048, .001, .05);
+        SOFT_BASE = builder.defineInRange("softQuicksandBase", .0065, .001, .05);
+        MOVING_EXTRA = builder.defineInRange("movingExtra", .001, 0, .05);
+        STRUGGLE_EXTRA = builder.defineInRange("struggleExtra", .002, 0, .05);
+        ENTRY_DAMPING = builder.comment("Fraction of residual downward momentum, for the first three contact ticks only.").defineInRange("entryDamping", .08, 0, 1);
         builder.pop();
         SPEC = builder.build();
     }
