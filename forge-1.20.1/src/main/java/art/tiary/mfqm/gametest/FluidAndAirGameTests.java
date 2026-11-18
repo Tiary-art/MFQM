@@ -49,4 +49,11 @@ public final class FluidAndAirGameTests {
         h.assertTrue(result.getBlockPos().equals(h.absolutePos(new BlockPos(7,2,5))),"solid wall remains the first valid target");
         pig.discard();h.succeed();
     }
+    @GameTest(template="pool_test",timeoutTicks=50) public static void exemptEntityStillWashesCosmeticResidue(GameTestHelper h) {
+        h.setBlock(4,1,4,Blocks.STONE);h.setBlock(4,2,4,Blocks.WATER);h.setBlock(4,3,4,Blocks.WATER);
+        var pig=h.spawnWithNoFreeWill(EntityType.PIG,new Vec3(4.5,2,4.5));pig.setInvulnerable(true);
+        var d=SinkCapability.get(pig);d.residueType="mud";d.residueTicks=1000;
+        h.runAfterDelay(5,()->{h.assertTrue(d.residueTicks<=800,"creative-like immunity must not bypass washing");pig.discard();h.succeed();});
+    }
+
 }

@@ -57,6 +57,7 @@ public final class SinkEngine {
         }
         if (exempt(entity)) {
             cleanup(entity, data, true);
+            decayResidue(entity,data);
             finish(entity, data, before, time);
             return;
         }
@@ -124,10 +125,15 @@ public final class SinkEngine {
                 entity.hurt(entity.damageSources().drown(), damage);
             }
         }
-        if (entity.isInWaterOrRain()) data.residueTicks = Math.max(0,data.residueTicks-50);
-        else if (!data.active() && data.residueTicks > 0) data.residueTicks--;
+        decayResidue(entity,data);
         art.tiary.mfqm.content.MaterialEffects.tick(level,entity,data,before,time);
         finish(entity, data, before, time);
+    }
+
+    private static void decayResidue(LivingEntity entity,SinkState data) {
+        // Creative/invulnerable physiology exemptions must not disable cosmetic washing or expiry.
+        if(entity.isInWaterOrRain()) data.residueTicks=Math.max(0,data.residueTicks-50);
+        else if(!data.active() && data.residueTicks>0) data.residueTicks--;
     }
 
     private static boolean finitePosition(LivingEntity entity) {
