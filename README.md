@@ -21,3 +21,9 @@ More Fun Quicksand Mod 的 Minecraft Java 1.20.1 Forge 移植研究项目。
 [完成报告与验证边界](forge-1.20.1/TASK_003_REPORT.md) · [证据追踪/差异表](forge-1.20.1/docs/task-003/EVIDENCE_TRACEABILITY.md) · [重现步骤](forge-1.20.1/docs/task-003/REPRODUCE.md) · [日志](forge-1.20.1/logs/task-003) · [开发测试 JAR](deliverables/task-003/mfqm-reborn-0.0.3-dev.jar)
 
 普通流沙、泥浆、松软流沙具有独立接触/阻力/支撑行为；服务端聚合状态、耗氧、伤害和生命周期。属于任务001静态证据指导下的近似实现，未取得1.7.10实机曲线，不宣称原版数值一致。默认占位为 Minecraft 自带16×16风格；没有使用AI生成贴图。任务004未开始。
+
+## 任务 003.5-B1：运动观测、候选陷落与落地修复
+
+[中文完成报告](forge-1.20.1/docs/task-0035-b1/COMPLETION_REPORT.zh-CN.md) · [自动化与实测结果](forge-1.20.1/docs/task-0035-b1/TEST_RESULTS.md) · [双客户端/延迟/低TPS](forge-1.20.1/docs/task-0035-b1/NETWORK_RESULTS.md) · [原始证据](forge-1.20.1/docs/task-0035-b1/evidence/INDEX.md) · [候选测试JAR](deliverables/task-0035-b1/mfqm-reborn-0.0.3.5-b1-candidate.jar)
+
+提供默认关闭的限时诊断、首次入射限制、材料持续下沉与受控落地历史处理。参数仍待玩法验收；间歇性Y轴抽搐未被证明修复。保留旧测试断言，完成23项JUnit/20项GameTest，以及有明确证据范围的真实玩家、自然猪、双客户端和低TPS测试。没有开始船只修复或任务004/005。

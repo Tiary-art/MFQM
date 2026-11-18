@@ -60,8 +60,11 @@ public final class SinkEngine {
             finish(entity, data, before, time);
             return;
         }
-        if (data.active() && data.hasPrevious && entity instanceof ServerPlayer player && SinkNetwork.connected(player)) {
+        if (data.hasPrevious && !entity.isPassenger() && entity instanceof ServerPlayer player && SinkNetwork.connected(player)) {
             reconcilePlayer(player, data);
+        } else if (data.active() && data.hasPrevious && entity.isPassenger()
+                && entity instanceof ServerPlayer player && SinkNetwork.connected(player)) {
+            reconcileMountedLegacy(player, data);
         }
         var contact = ContactSampler.sample(level, entity);
         if (contact.material() == null) {
@@ -83,12 +86,14 @@ public final class SinkEngine {
                     data.immersion, contact.depthBlocks(), contact.centerX(), contact.centerZ(), moving, struggle, entity.onGround());
             data.stuck = result.stuck();
             var v = result.motion();
-            data.lastVertical = v.y();
-            entity.setDeltaMovement(v.x(), v.y(), v.z());
-            entity.hasImpulse = true;
-            entity.fallDistance = 0;
+            double vertical = entity.isPassenger() ? v.y() : MotionMath.velocity(data.material, contact.depthBlocks(), moving, struggle, SinkConfig.motionPolicy());
+            data.lastVertical = vertical;
+            entity.setDeltaMovement(v.x(), vertical, v.z());
+            entity.hasImpulse = !(entity instanceof ServerPlayer) || entity.isPassenger();
+            // Preserve Task 003's mounted LivingEntity fallback; B1 makes no boat/rider fix.
+            if (entity.isPassenger()) entity.fallDistance = 0;
             setModifier(entity, result.speedFactor());
-            if (entity instanceof ServerPlayer player && player.connection != null) {
+            if (entity.isPassenger() && entity instanceof ServerPlayer player && player.connection != null) {
                 player.connection.send(new ClientboundSetEntityMotionPacket(entity));
             }
         }
@@ -114,6 +119,20 @@ public final class SinkEngine {
         return Double.isFinite(entity.getX()) && Double.isFinite(entity.getY()) && Double.isFinite(entity.getZ());
     }
 
+    private static void reconcileMountedLegacy(ServerPlayer player, SinkState data) {
+        double dx = player.getX() - data.previousX, dy = player.getY() - data.previousY, dz = player.getZ() - data.previousZ;
+        if (dx * dx + dy * dy + dz * dz > 16 * 16) {
+            data.leaveContact(); data.hasPrevious = false; removeModifier(player); return;
+        }
+        var limit = SinkMath.limitPlayerStep(new SinkMath.Motion(dx, dy, dz), data.lastVertical,
+                player.getAttributeValue(Attributes.MOVEMENT_SPEED), data.material == MaterialProfile.MUD && data.mudDepth == 0);
+        if (Math.abs(dx - limit.x()) + Math.abs(dy - limit.y()) + Math.abs(dz - limit.z()) > 0.001) {
+            data.motionCorrections++; data.correctionReason = "legacy_mounted_step_budget";
+            player.connection.teleport(data.previousX + limit.x(), data.previousY + limit.y(), data.previousZ + limit.z(),
+                    player.getYRot(), player.getXRot());
+        }
+    }
+
     private static void reconcilePlayer(ServerPlayer player, SinkState data) {
         double dx = player.getX() - data.previousX, dy = player.getY() - data.previousY, dz = player.getZ() - data.previousZ;
         // Unknown server-side teleports from other mods must not drag an entity back into a pit.
@@ -124,11 +143,25 @@ public final class SinkEngine {
             removeModifier(player);
             return;
         }
-        var limit = SinkMath.limitPlayerStep(new SinkMath.Motion(dx, dy, dz), data.lastVertical,
-                player.getAttributeValue(Attributes.MOVEMENT_SPEED), data.material == MaterialProfile.MUD && data.mudDepth == 0);
-        if (Math.abs(dx - limit.x()) + Math.abs(dy - limit.y()) + Math.abs(dz - limit.z()) > 0.001) {
-            player.connection.teleport(data.previousX + limit.x(), data.previousY + limit.y(), data.previousZ + limit.z(),
-                    player.getYRot(), player.getXRot());
+        var policy = SinkConfig.motionPolicy();
+        long now = System.nanoTime();
+        double elapsed = data.motionNano == 0 ? 1 : (now - data.motionNano) / 50_000_000.0;
+        data.motionNano = now;
+        var swept = ContactSampler.entry(player.level(), player, data.previousY, player.getY());
+        double minY = Double.NEGATIVE_INFINITY;
+        String reason = "none";
+        if (!data.active() && swept != null) {
+            minY = swept.surface() - policy.entryDepth();
+            reason = "entry_penetration";
+        } else if (data.active() && ContactSampler.sample(player.level(), player).material() != null) {
+            minY = data.previousY - MotionMath.downwardBudget(elapsed, policy);
+            reason = "terminal_budget";
+        }
+        // Exceptional server correction only. Ordinary accepted client steps are not teleported.
+        if (player.getY() < minY - 0.001) {
+            data.motionCorrections++;
+            data.correctionReason = reason;
+            player.connection.teleport(player.getX(), minY, player.getZ(), player.getYRot(), player.getXRot());
         }
     }
 
@@ -142,6 +175,7 @@ public final class SinkEngine {
         }
         data.wasActive = data.active();
         if (data.trace != null) data.trace.record(entity, data, time);
+        art.tiary.mfqm.diagnostic.MotionDiagnostics.point(entity, "settle_end");
     }
 
     public static void removeModifier(LivingEntity entity) {
