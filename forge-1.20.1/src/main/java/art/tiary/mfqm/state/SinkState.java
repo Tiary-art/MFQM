@@ -33,9 +33,18 @@ public final class SinkState {
     public long motionCorrections;
     public String correctionReason = "none";
 
+    public art.tiary.mfqm.physics.MotionMath.Phase motionPhase = art.tiary.mfqm.physics.MotionMath.Phase.OUTSIDE;
+    public int motionAge;
+    public long motionNano;
+    public boolean controlledMotion;
+
     public boolean active() { return material != null; }
 
     public void leaveContact() {
+        motionPhase = motionPhase == art.tiary.mfqm.physics.MotionMath.Phase.OUTSIDE
+                ? motionPhase : art.tiary.mfqm.physics.MotionMath.Phase.EXITING;
+        motionAge = 0;
+        controlledMotion = false;
         material = null;
         immersion = 0;
         stuck = 0;
@@ -55,6 +64,8 @@ public final class SinkState {
         lastDamageTick = Long.MIN_VALUE;
         lastSnapshotTick = Long.MIN_VALUE;
         hasPrevious = false;
+        motionPhase = art.tiary.mfqm.physics.MotionMath.Phase.OUTSIDE;
+        motionNano = 0;
         wasActive = false;
         closeTrace();
     }

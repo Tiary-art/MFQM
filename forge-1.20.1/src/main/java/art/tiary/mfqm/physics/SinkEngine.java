@@ -60,7 +60,7 @@ public final class SinkEngine {
             finish(entity, data, before, time);
             return;
         }
-        if (data.active() && data.hasPrevious && entity instanceof ServerPlayer player && SinkNetwork.connected(player)) {
+        if (data.hasPrevious && !entity.isPassenger() && entity instanceof ServerPlayer player && SinkNetwork.connected(player)) {
             reconcilePlayer(player, data);
         }
         var contact = ContactSampler.sample(level, entity);
@@ -83,12 +83,12 @@ public final class SinkEngine {
                     data.immersion, contact.depthBlocks(), contact.centerX(), contact.centerZ(), moving, struggle, entity.onGround());
             data.stuck = result.stuck();
             var v = result.motion();
-            data.lastVertical = v.y();
-            entity.setDeltaMovement(v.x(), v.y(), v.z());
-            entity.hasImpulse = true;
-            entity.fallDistance = 0;
+            double vertical = entity.isPassenger() ? v.y() : MotionMath.velocity(data.material, contact.depthBlocks(), moving, struggle, SinkConfig.motionPolicy());
+            data.lastVertical = vertical;
+            entity.setDeltaMovement(v.x(), vertical, v.z());
+            entity.hasImpulse = !(entity instanceof ServerPlayer);
             setModifier(entity, result.speedFactor());
-            if (entity instanceof ServerPlayer player && player.connection != null) {
+            if (entity.isPassenger() && entity instanceof ServerPlayer player && player.connection != null) {
                 player.connection.send(new ClientboundSetEntityMotionPacket(entity));
             }
         }
@@ -124,13 +124,25 @@ public final class SinkEngine {
             removeModifier(player);
             return;
         }
-        var limit = SinkMath.limitPlayerStep(new SinkMath.Motion(dx, dy, dz), data.lastVertical,
-                player.getAttributeValue(Attributes.MOVEMENT_SPEED), data.material == MaterialProfile.MUD && data.mudDepth == 0);
-        if (Math.abs(dx - limit.x()) + Math.abs(dy - limit.y()) + Math.abs(dz - limit.z()) > 0.001) {
+        var policy = SinkConfig.motionPolicy();
+        long now = System.nanoTime();
+        double elapsed = data.motionNano == 0 ? 1 : (now - data.motionNano) / 50_000_000.0;
+        data.motionNano = now;
+        var swept = ContactSampler.entry(player.level(), player, data.previousY, player.getY());
+        double minY = Double.NEGATIVE_INFINITY;
+        String reason = "none";
+        if (!data.active() && swept != null) {
+            minY = swept.surface() - policy.entryDepth();
+            reason = "entry_penetration";
+        } else if (data.active() && ContactSampler.sample(player.level(), player).material() != null) {
+            minY = data.previousY - MotionMath.downwardBudget(elapsed, policy);
+            reason = "terminal_budget";
+        }
+        // Exceptional server correction only. Ordinary accepted client steps are not teleported.
+        if (player.getY() < minY - 0.001) {
             data.motionCorrections++;
-            data.correctionReason = "legacy_step_budget";
-            player.connection.teleport(data.previousX + limit.x(), data.previousY + limit.y(), data.previousZ + limit.z(),
-                    player.getYRot(), player.getXRot());
+            data.correctionReason = reason;
+            player.connection.teleport(player.getX(), minY, player.getZ(), player.getYRot(), player.getXRot());
         }
     }
 

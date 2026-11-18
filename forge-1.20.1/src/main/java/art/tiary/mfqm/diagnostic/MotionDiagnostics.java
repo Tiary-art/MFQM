@@ -79,6 +79,7 @@ public final class MotionDiagnostics {
     private static final class Session {
         final Path path;
         final BufferedWriter writer;
+        boolean writeFailed;
         final long until;
         final LivingEntity target;
         final String token;
@@ -144,6 +145,7 @@ public final class MotionDiagnostics {
             write(line.substring(0, line.length() - 1) + String.format(java.util.Locale.ROOT,
                     ",\"surface\":%.6f,\"depth\":%.6f,\"observed_material\":\"%s\"}",
                     observed.surface(), observed.depthBlocks(), observed.material() == null ? "none" : observed.material().id));
+            event("motion_phase", data.motionPhase.name() + ";controlled=" + data.controlledMotion + ";age=" + data.motionAge);
             if (post) { lastY = entity.getY(); lastTick = tick; previousActive = data.active(); }
         }
         void event(String kind, String detail) {
@@ -152,8 +154,9 @@ public final class MotionDiagnostics {
         }
         void drain() { for (int i = 0; i < 64; i++) { var p = packets.poll(); if (p == null) break; write(p); } }
         void write(String line) {
+            if (writeFailed) return;
             try { writer.write(line); writer.newLine(); writer.flush(); }
-            catch (IOException ex) { MfqmReborn.LOGGER.warn("Diagnostic write stopped", ex); }
+            catch (IOException ex) { writeFailed = true; MfqmReborn.LOGGER.warn("Diagnostic write stopped", ex); }
         }
         void close() {
             drain();

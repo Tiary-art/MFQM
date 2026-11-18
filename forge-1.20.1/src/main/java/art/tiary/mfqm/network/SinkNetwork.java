@@ -20,7 +20,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class SinkNetwork {
-    private static final String VERSION = "1";
+    private static final String VERSION = "2-b1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(MfqmReborn.MOD_ID, "sink"), () -> VERSION, VERSION::equals, VERSION::equals);
     private SinkNetwork() { }

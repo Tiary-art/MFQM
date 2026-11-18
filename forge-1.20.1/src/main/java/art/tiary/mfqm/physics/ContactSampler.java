@@ -1,7 +1,7 @@
 package art.tiary.mfqm.physics;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -10,7 +10,27 @@ public final class ContactSampler {
                           double centerX, double centerZ, boolean eyes, int cells, int mudDepth) { }
     private ContactSampler() { }
 
-    public static Contact sample(ServerLevel level, LivingEntity entity) {
+    /** Bounded downward sweep of the feet footprint; no chunk loads or collision edits. */
+    public static Contact entry(Level level, LivingEntity entity, double fromY, double toY) {
+        if (!Double.isFinite(fromY) || !Double.isFinite(toY) || toY >= fromY || fromY - toY > 16) return null;
+        var box = entity.getBoundingBox();
+        Contact best = null;
+        for (int x = Mth.floor(Math.max(box.minX + 1e-6, entity.getX() - 4)); x <= Mth.floor(box.maxX - 1e-6) && x < entity.getX() + 5; x++)
+            for (int z = Mth.floor(Math.max(box.minZ + 1e-6, entity.getZ() - 4)); z <= Mth.floor(box.maxZ - 1e-6) && z < entity.getZ() + 5; z++)
+                for (int y = Mth.floor(fromY); y >= Mth.floor(toY) - 1; y--) {
+                    var pos = new BlockPos(x, y, z);
+                    if (!level.hasChunkAt(pos) || !(level.getBlockState(pos).getBlock() instanceof SinkingBlock b)) continue;
+                    if (level.getBlockState(pos.above()).getBlock() == b) continue;
+                    double surface = y + b.profile().surfaceHeight;
+                    if (fromY < surface - 0.05 || toY > surface + 0.05) continue;
+                    if (best == null || surface > best.surface()) best = new Contact(b.profile(), surface, 0, 0,
+                            x + 0.5 - entity.getX(), z + 0.5 - entity.getZ(), false, 1,
+                            b instanceof MudBlock ? MudGeometry.effectiveDepth(MudBlock.grid(level, pos), level.getBlockState(pos).getValue(MudBlock.DEPTH)) : 0);
+                }
+        return best;
+    }
+
+    public static Contact sample(Level level, LivingEntity entity) {
         var box = entity.getBoundingBox();
         MaterialProfile selected = null;
         double best = -1, surface = 0, cx = 0, cz = 0;

@@ -22,6 +22,11 @@ minecraft {
             mods { mfqm { source sourceSets.main } }
         }
         client { }
+        observer {
+            parent runs.client
+            workingDirectory project.file('run/observer')
+            args '--username', 'Observer'
+        }
         server { args '--nogui' }
         gameTestServer { }
     }
