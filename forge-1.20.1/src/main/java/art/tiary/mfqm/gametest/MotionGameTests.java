@@ -57,4 +57,19 @@ public final class MotionGameTests {
                 "lifecycle clears candidate history");
         pig.discard(); h.succeed();
     }
+    @GameTest(template = "pool_test")
+    public static void controlledLandingDoesNotGrantOutsideFallImmunity(GameTestHelper h) {
+        CoreMaterialGameTests.pool(h, MaterialProfile.QUICKSAND);
+        var pig = h.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, 4.5, 8.5));
+        MotionRuntime.prepare(pig, false);
+        float health = pig.getHealth();
+        pig.causeFallDamage(10, 1, pig.damageSources().fall());
+        h.assertTrue(pig.getHealth() == health, "confirmed slow material landing discards old fall history");
+        pig.setPos(pig.getX() + 30, pig.getY() + 10, pig.getZ());
+        pig.setDeltaMovement(0, -1, 0);
+        MotionRuntime.prepare(pig, false);
+        pig.causeFallDamage(10, 1, pig.damageSources().fall());
+        h.assertTrue(pig.getHealth() < health, "outside fall still causes real vanilla damage");
+        pig.discard(); h.succeed();
+    }
 }
