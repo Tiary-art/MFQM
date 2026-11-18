@@ -9,3 +9,5 @@ liquid-invalid-bound intentionally invokes isWL76, preserving the partial writes
 private-import-guard.json records the expected refusal to extract original pixels/audio into a Git worktree. No resource file was extracted.
 
 First 64-case run had 13 independent Mud comparisons. A final additional all-layouts fixture covers all 128 local occupancy boolean layouts plus applied/refused write columns, giving 65 cases and 14 comparisons. Final all_checks completed; later asset audio mapping/guard were checked separately without rerunning unchanged game-model cases.
+
+Publication whitespace check initially flagged CRLF line endings in two generated asset CSVs. The CSV writer now emits LF; the full branch whitespace check was repeated. This is an artifact formatting fix, not a gameplay/model failure.

@@ -9,14 +9,14 @@ for x in rows:
  alias='legacy/'+tail[:-4].lower();assert alias not in seen,alias;seen.add(alias);mapping.append({'original_path':path,'original_sha256':x['sha256'],'modern_resource_id_proposal':'mfqm:'+alias,'modern_target_proposal':'assets/mfqm/textures/'+alias+'.png','width':x['width'],'height':x['height'],'animation_sidecar':x['animated_metadata'],'status':'PROPOSED_PATH_MAPPING; original pixels unchanged; modern UV/animation compatibility not validated'})
 (r/'evidence/results/original-asset-path-map.csv').parent.mkdir(parents=True,exist_ok=True)
 with(r/'evidence/results/original-asset-path-map.csv').open('w',newline='')as f:
- w=csv.DictWriter(f,fieldnames=list(mapping[0]));w.writeheader();w.writerows(mapping)
+ w=csv.DictWriter(f,fieldnames=list(mapping[0]),lineterminator="\n");w.writeheader();w.writerows(mapping)
 audio=[]
 with zipfile.ZipFile(a.jar) as z:
  for name in sorted(z.namelist()):
   if not name.endswith('.ogg'):continue
   tail=name.split('/sounds/',1)[1];alias='legacy/'+tail[:-4].lower();audio.append({'original_path':name,'sha256':hashlib.sha256(z.read(name)).hexdigest(),'modern_sound_file_proposal':'assets/mfqm/sounds/'+alias+'.ogg','modern_sound_resource_proposal':'mfqm:'+alias,'status':'Original-JAR-packaged audio path mapping; rights unconfirmed; event registration/playback not implemented'})
 with(r/'evidence/results/original-audio-path-map.csv').open('w',newline='')as f:
- w=csv.DictWriter(f,fieldnames=list(audio[0]));w.writeheader();w.writerows(audio)
+ w=csv.DictWriter(f,fieldnames=list(audio[0]),lineterminator="\n");w.writeheader();w.writerows(audio)
 if a.extract:
  assert a.out is not None,'--extract requires --out';dest=a.out.resolve()
  assert not any((p/'.git').exists()for p in [dest,*dest.parents]),'private extraction cannot target a Git worktree'
