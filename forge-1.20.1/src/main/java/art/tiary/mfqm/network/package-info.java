@@ -1,2 +1,2 @@
-/** Future versioned, validated server-authoritative messages; no custom channel yet. */
+/** Versioned, directional sink snapshots and validated boolean struggle intents. */
 package art.tiary.mfqm.network;

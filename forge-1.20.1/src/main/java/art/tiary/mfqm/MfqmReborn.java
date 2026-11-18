@@ -2,6 +2,10 @@ package art.tiary.mfqm;
 
 import art.tiary.mfqm.registry.ModBlocks;
 import art.tiary.mfqm.registry.ModItems;
+import art.tiary.mfqm.network.SinkNetwork;
+import art.tiary.mfqm.physics.SinkConfig;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -20,17 +24,22 @@ public final class MfqmReborn {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ModBlocks.BLOCKS.register(bus);
         ModItems.ITEMS.register(bus);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SinkConfig.SPEC);
+        SinkNetwork.register();
         bus.addListener(this::commonSetup);
         bus.addListener(this::creativeContents);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        LOGGER.info("MFQM Task 002 foundation initialized; development block only, no quicksand physics");
+        LOGGER.info("MFQM Task 003 initialized; three server-authoritative core materials, static-evidence approximation");
     }
 
     private void creativeContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModItems.DEV_TEST_BLOCK);
+            event.accept(ModItems.QUICKSAND);
+            event.accept(ModItems.MUD);
+            event.accept(ModItems.SOFT_QUICKSAND);
         }
     }
 }

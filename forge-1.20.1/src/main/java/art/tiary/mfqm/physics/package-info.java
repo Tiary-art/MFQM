@@ -1,2 +1,2 @@
-/** Future per-entity sinking physics; not implemented in Task 002. */
+/** Server-authoritative material sampling, bounded motion, geometry and measurement tools. */
 package art.tiary.mfqm.physics;

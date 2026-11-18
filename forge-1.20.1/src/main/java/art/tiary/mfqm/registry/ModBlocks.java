@@ -1,6 +1,9 @@
 package art.tiary.mfqm.registry;
 
 import art.tiary.mfqm.MfqmReborn;
+import art.tiary.mfqm.physics.MaterialProfile;
+import art.tiary.mfqm.physics.SinkingBlock;
+import art.tiary.mfqm.physics.MudBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -13,6 +16,13 @@ public final class ModBlocks {
     // Ordinary solid block: deliberately no custom sinking, suffocation or rescue behavior.
     public static final RegistryObject<Block> DEV_TEST_BLOCK = BLOCKS.register("dev_test_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.SAND).strength(0.5F)));
+
+    public static final RegistryObject<Block> QUICKSAND = BLOCKS.register("quicksand",
+            () -> new SinkingBlock(MaterialProfile.QUICKSAND, BlockBehaviour.Properties.copy(Blocks.SAND).strength(2.5F)));
+    public static final RegistryObject<Block> MUD = BLOCKS.register("mud",
+            () -> new MudBlock(BlockBehaviour.Properties.copy(Blocks.MUD).strength(0.6F)));
+    public static final RegistryObject<Block> SOFT_QUICKSAND = BLOCKS.register("soft_quicksand",
+            () -> new SinkingBlock(MaterialProfile.SOFT_QUICKSAND, BlockBehaviour.Properties.copy(Blocks.RED_SAND).strength(1.0F)));
 
     private ModBlocks() { }
 }
