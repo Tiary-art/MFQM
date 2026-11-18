@@ -125,6 +125,7 @@ public final class MotionTrials {
         } else player.connection.teleport(0.5, surface + c.height + 0.01, 0.5, 0, 30);
         target.fallDistance = 0; target.setDeltaMovement(Vec3.ZERO);
         if (target == player) player.connection.send(new ClientboundSetEntityMotionPacket(player));
+        art.tiary.mfqm.network.SinkNetwork.syncTo(player, player);
         FIXTURES.put(player.getUUID(), target);
         String label = prefix + "_" + (c.pig ? "pig" : "player") + "_" + c.material + "_L" + c.layers + "_H" + c.height;
         MotionDiagnostics.start(player, target, 260, label);
