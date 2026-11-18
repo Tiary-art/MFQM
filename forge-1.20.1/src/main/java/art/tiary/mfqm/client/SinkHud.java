@@ -19,7 +19,7 @@ public final class SinkHud {
             var eye=mc.gameRenderer.getMainCamera().getPosition();
             var pos=net.minecraft.core.BlockPos.containing(eye);
             var state=mc.level.getBlockState(pos);
-            if(!(state.getBlock() instanceof art.tiary.mfqm.physics.SinkingBlock b) || eye.y>=pos.getY()+b.surfaceHeight(state,mc.level,pos)) return;
+            if(!(state.getBlock() instanceof art.tiary.mfqm.physics.SinkingMedium b) || eye.y>=pos.getY()+b.surfaceHeight(state,mc.level,pos)) return;
             String texture=b.profile()==art.tiary.mfqm.physics.MaterialProfile.MUD ? "mud" : b.profile()==art.tiary.mfqm.physics.MaterialProfile.SOFT_QUICKSAND ? "red_sand" : "sand";
             com.mojang.blaze3d.systems.RenderSystem.enableBlend();
             com.mojang.blaze3d.systems.RenderSystem.setShaderColor(.4f,.4f,.4f,.78f);

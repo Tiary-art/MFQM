@@ -24,6 +24,8 @@ public final class MfqmReborn {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ModBlocks.BLOCKS.register(bus);
         art.tiary.mfqm.content.MaterialEffects.SOUNDS.register(bus);
+        art.tiary.mfqm.content.LegacyFluids.TYPES.register(bus);
+        art.tiary.mfqm.content.LegacyFluids.FLUIDS.register(bus);
         ModItems.ITEMS.register(bus);
         art.tiary.mfqm.registry.ModTabs.TABS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SinkConfig.SPEC);

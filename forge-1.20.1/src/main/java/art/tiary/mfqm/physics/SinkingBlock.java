@@ -10,7 +10,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** Blocks supply shapes only. All physiological and motion effects are settled centrally. */
-public class SinkingBlock extends Block {
+public class SinkingBlock extends Block implements SinkingMedium {
     private final MaterialProfile profile;
 
     public SinkingBlock(MaterialProfile profile, BlockBehaviour.Properties properties) {

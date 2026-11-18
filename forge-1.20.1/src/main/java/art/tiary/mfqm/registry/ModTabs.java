@@ -16,6 +16,7 @@ public final class ModTabs {
             .displayItems((params,out)->{
                 for (var kind : LegacyCatalog.Kind.values()) for (var s : LegacyCatalog.ALL)
                     if (s.visible() && s.kind()==kind) out.accept(ModItems.LEGACY.get(s.id()).get());
+                for(var f:art.tiary.mfqm.content.LegacyFluids.ALL.values()) out.accept(f.bucket().get());
                 out.accept(ModItems.DEV_TEST_BLOCK.get());
             }).build());
     private ModTabs() { }

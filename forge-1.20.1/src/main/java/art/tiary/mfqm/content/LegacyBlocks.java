@@ -23,7 +23,8 @@ public final class LegacyBlocks {
         var p = BlockBehaviour.Properties.copy(Blocks.DIRT).strength(s.hardness()).lightLevel(state -> s.emission());
         if (s.drop().equals("EMPTY")) p.noLootTable();
         return switch (s.kind()) {
-            case SINKING, VISCOUS -> new MaterialBlock(s, p);
+            case SINKING -> new MaterialBlock(s, p);
+            case VISCOUS -> new LegacyFluids.MaterialLiquid(s,p);
             case TRAP -> new Trap(p);
             case SLAB -> new SlabBlock(p.noOcclusion());
             case PLANT -> new Plant(p.noCollission().noOcclusion().instabreak());
@@ -60,7 +61,7 @@ public final class LegacyBlocks {
     public static final class Plant extends BushBlock {
         Plant(BlockBehaviour.Properties p) { super(p); }
         @Override protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
-            return state.getBlock() instanceof SinkingBlock || super.mayPlaceOn(state,level,pos);
+            return state.getBlock() instanceof art.tiary.mfqm.physics.SinkingMedium || super.mayPlaceOn(state,level,pos);
         }
     }
     /** Legacy horizontal powered conversion, bounded to64 cells instead of recursive world traversal. */

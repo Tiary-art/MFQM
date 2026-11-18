@@ -24,7 +24,7 @@
     "evidence_file": "BlockMud.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "核心运动可实测；旧曲线未测定；下移调度、混合边界、跨模组视觉兼容仍有缺口"
   },
   {
     "id": "bog",
@@ -51,7 +51,7 @@
     "evidence_file": "BlockBog.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "soft_snow",
@@ -105,7 +105,7 @@
     "evidence_file": "BlockSand.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "soft_quicksand",
@@ -132,7 +132,7 @@
     "evidence_file": "BlockSoftQuicksand.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "核心运动可实测；旧曲线未测定；下移调度、混合边界、跨模组视觉兼容仍有缺口"
   },
   {
     "id": "morass",
@@ -294,7 +294,7 @@
     "evidence_file": "BlockQuicksand.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "核心运动可实测；旧曲线未测定；下移调度、混合边界、跨模组视觉兼容仍有缺口"
   },
   {
     "id": "sandstone_trap",
@@ -348,7 +348,7 @@
     "evidence_file": "BlockJungleQuicksand.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "liquid_mire",
@@ -375,7 +375,7 @@
     "evidence_file": "BlockLiquidMire.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "stable_liquid_mire",
@@ -402,7 +402,7 @@
     "evidence_file": "BlockStableLiquidMire.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "sinky_liquid",
@@ -429,7 +429,7 @@
     "evidence_file": "BlockSinkyLiquid.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "sinking_slime",
@@ -456,7 +456,7 @@
     "evidence_file": "BlockSlime.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "mucus",
@@ -483,7 +483,7 @@
     "evidence_file": "BlockMucus.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "mire",
@@ -672,7 +672,7 @@
     "evidence_file": "BlockTar.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "larvae",
@@ -698,8 +698,8 @@
     "evidence": "MFQM.analysis.txt:1066",
     "evidence_file": "BlockLarvae.analysis.txt",
     "texture_references": [],
-    "status": "PARTIAL",
-    "missing": "TileEntity TileEntityLarvae and its associated entity/tool interactions are not implemented yet."
+    "status": "REGISTERED_ONLY",
+    "missing": "原版 TileEntity/实体/传播或气体伤害系统未恢复；当前基础方块仅保证注册、物品与资源占位"
   },
   {
     "id": "corrupted_sand",
@@ -780,7 +780,7 @@
     "evidence_file": "BlockAcid.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "slurry",
@@ -807,7 +807,7 @@
     "evidence_file": "BlockSlurry.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "gas",
@@ -834,7 +834,7 @@
     "evidence_file": "BlockGas.analysis.txt",
     "texture_references": [],
     "status": "REGISTERED_ONLY",
-    "missing": "Gas spread/explosion/effect parity not implemented; non-solid temporary gas placeholder only."
+    "missing": "原版 TileEntity/实体/传播或气体伤害系统未恢复；当前基础方块仅保证注册、物品与资源占位"
   },
   {
     "id": "soft_gravel",
@@ -888,7 +888,7 @@
     "evidence_file": "BlockHoney.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "solid_honey",
@@ -969,7 +969,7 @@
     "evidence_file": "BlockLiquidChocolate.analysis.txt",
     "texture_references": [],
     "status": "PARTIAL",
-    "missing": "Legacy curve/meta, special drops and interactions need per-class parity validation; vanilla texture placeholder."
+    "missing": "真实 Forge 流体/源/流动/桶已实现；现代默认流动参数，旧版黏度曲线、混合反应与特效未完整复刻"
   },
   {
     "id": "chocolate",
@@ -1049,8 +1049,8 @@
     "evidence": "MFQM.analysis.txt:1122",
     "evidence_file": "BlockLure.analysis.txt",
     "texture_references": [],
-    "status": "PARTIAL",
-    "missing": "TileEntity TileEntityLure and its associated entity/tool interactions are not implemented yet."
+    "status": "REGISTERED_ONLY",
+    "missing": "原版 TileEntity/实体/传播或气体伤害系统未恢复；当前基础方块仅保证注册、物品与资源占位"
   },
   {
     "id": "blossom",
@@ -1076,8 +1076,8 @@
     "evidence": "MFQM.analysis.txt:1127",
     "evidence_file": "BlockBlossom.analysis.txt",
     "texture_references": [],
-    "status": "PARTIAL",
-    "missing": "TileEntity TileEntityBlossom and its associated entity/tool interactions are not implemented yet."
+    "status": "REGISTERED_ONLY",
+    "missing": "原版 TileEntity/实体/传播或气体伤害系统未恢复；当前基础方块仅保证注册、物品与资源占位"
   },
   {
     "id": "blossom_slab",
@@ -1157,8 +1157,8 @@
     "evidence": "MFQM.analysis.txt:1146",
     "evidence_file": "BlockMeat.analysis.txt",
     "texture_references": [],
-    "status": "PARTIAL",
-    "missing": "TileEntity TileEntityMeat and its associated entity/tool interactions are not implemented yet."
+    "status": "REGISTERED_ONLY",
+    "missing": "原版 TileEntity/实体/传播或气体伤害系统未恢复；当前基础方块仅保证注册、物品与资源占位"
   },
   {
     "id": "temp_meat",

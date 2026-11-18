@@ -24,8 +24,11 @@ public final class ClientCompatibility {
         if(speed==null || p.getAbilities().getWalkingSpeed()==0) return;
         var own=speed.getModifier(SinkEngine.SLOWNESS_ID);
         if(own==null || own.getAmount()<=-1) return;
-        // Our sole modifier is MULTIPLY_TOTAL: dividing only it retains every foreign modifier.
-        double current=speed.getValue(), counterfactual=current/(1+own.getAmount());
+        // Recompute the attribute with only our UUID excluded, retaining all vanilla/foreign operations and clamps.
+        var without=new net.minecraft.world.entity.ai.attributes.AttributeInstance(speed.getAttribute(), ignored -> {});
+        without.setBaseValue(speed.getBaseValue());
+        for(var modifier:speed.getModifiers()) if(!modifier.getId().equals(SinkEngine.SLOWNESS_ID)) without.addTransientModifier(modifier);
+        double current=speed.getValue(), counterfactual=without.getValue();
         double walk=p.getAbilities().getWalkingSpeed();
         double ratio=(counterfactual/walk+1)/(current/walk+1);
         if(Double.isFinite(ratio)) e.setNewFovModifier((float)(e.getNewFovModifier()*ratio));
