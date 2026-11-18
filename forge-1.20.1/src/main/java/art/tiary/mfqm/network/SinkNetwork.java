@@ -26,6 +26,13 @@ public final class SinkNetwork {
     private SinkNetwork() { }
 
     public static void register() {
+        CHANNEL.messageBuilder(Diagnostic.class, 2, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((m, b) -> { b.writeVarInt(m.entity); b.writeVarInt(m.ticks); b.writeUtf(m.label, 64); b.writeUtf(m.token, 8); })
+                .decoder(b -> new Diagnostic(b.readVarInt(), b.readVarInt(), b.readUtf(64), b.readUtf(8)))
+                .consumerMainThread((m, ctx) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> art.tiary.mfqm.client.ClientMotionDiagnostics.start(m.entity, m.ticks, m.label, m.token));
+                    ctx.get().setPacketHandled(true);
+                }).add();
         CHANNEL.messageBuilder(Snapshot.class, 0, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Snapshot::encode).decoder(Snapshot::decode).consumerMainThread(Snapshot::handle).add();
         CHANNEL.messageBuilder(Struggle.class, 1, NetworkDirection.PLAY_TO_SERVER)
@@ -48,6 +55,11 @@ public final class SinkNetwork {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientSinkState.accept(msg));
             ctx.get().setPacketHandled(true);
         }
+    }
+
+    private record Diagnostic(int entity, int ticks, String label, String token) { }
+    public static void startDiagnostic(ServerPlayer owner, int entity, int ticks, String label, String token) {
+        if (connected(owner)) CHANNEL.send(PacketDistributor.PLAYER.with(() -> owner), new Diagnostic(entity, ticks, label, token));
     }
 
     public record Struggle(boolean held) {

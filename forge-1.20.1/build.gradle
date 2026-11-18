@@ -18,6 +18,7 @@ minecraft {
             property 'forge.logging.console.level', 'info'
             property 'forge.enabledGameTestNamespaces', mod_id
             if (project.hasProperty('traceSnapshots')) property 'mfqm.traceSnapshots', 'true'
+            if (project.hasProperty('sourceRevision')) property 'mfqm.sourceRevision', project.property('sourceRevision')
             mods { mfqm { source sourceSets.main } }
         }
         client { }

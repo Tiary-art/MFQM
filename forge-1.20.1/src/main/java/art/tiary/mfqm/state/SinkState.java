@@ -30,6 +30,8 @@ public final class SinkState {
     public String residueType = "";
     public int residueTicks;
     public TraceSession trace;
+    public long motionCorrections;
+    public String correctionReason = "none";
 
     public boolean active() { return material != null; }
 

@@ -127,6 +127,8 @@ public final class SinkEngine {
         var limit = SinkMath.limitPlayerStep(new SinkMath.Motion(dx, dy, dz), data.lastVertical,
                 player.getAttributeValue(Attributes.MOVEMENT_SPEED), data.material == MaterialProfile.MUD && data.mudDepth == 0);
         if (Math.abs(dx - limit.x()) + Math.abs(dy - limit.y()) + Math.abs(dz - limit.z()) > 0.001) {
+            data.motionCorrections++;
+            data.correctionReason = "legacy_step_budget";
             player.connection.teleport(data.previousX + limit.x(), data.previousY + limit.y(), data.previousZ + limit.z(),
                     player.getYRot(), player.getXRot());
         }
@@ -142,6 +144,7 @@ public final class SinkEngine {
         }
         data.wasActive = data.active();
         if (data.trace != null) data.trace.record(entity, data, time);
+        art.tiary.mfqm.diagnostic.MotionDiagnostics.point(entity, "settle_end");
     }
 
     public static void removeModifier(LivingEntity entity) {
