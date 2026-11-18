@@ -19,6 +19,8 @@ public class SinkingBlock extends Block {
         this.profile = profile;
     }
 
+    public double motionScale() { return 1; }
+
     public MaterialProfile profile() { return profile; }
 
     @Override

@@ -86,7 +86,7 @@ public final class SinkEngine {
                     data.immersion, contact.depthBlocks(), contact.centerX(), contact.centerZ(), moving, struggle, entity.onGround());
             data.stuck = result.stuck();
             var v = result.motion();
-            double vertical = entity.isPassenger() ? v.y() : MotionMath.velocity(data.material, contact.depthBlocks(), moving, struggle, SinkConfig.motionPolicy());
+            double vertical = entity.isPassenger() ? v.y() : Math.max(-SinkConfig.motionPolicy().terminal(), MotionMath.velocity(data.material, contact.depthBlocks(), moving, struggle, SinkConfig.motionPolicy()) * contact.motionScale());
             data.lastVertical = vertical;
             entity.setDeltaMovement(v.x(), vertical, v.z());
             entity.hasImpulse = !(entity instanceof ServerPlayer) || entity.isPassenger();

@@ -41,7 +41,8 @@ public final class MotionRuntime {
         boolean atSurface = c.material() != null;
         d.motionPhase = !atSurface || d.motionAge++ < 3 ? MotionMath.Phase.ENTERING : MotionMath.Phase.SUBMERGED;
         double vy = atSurface ? MotionMath.velocity(c.material(), c.depthBlocks(), e.getDeltaMovement().horizontalDistanceSqr() > 0.00000225,
-                jumping || d.jumpHeld, p) : MotionMath.entryStep(e.getY(), entry.surface(), incoming, p);
+                jumping || d.jumpHeld, p) * c.motionScale() : MotionMath.entryStep(e.getY(), entry.surface(), incoming, p);
+        if (atSurface) vy = Math.max(-p.terminal(), vy);
         // Shallow mud's solid half-height landing/jump remains vanilla geometry.
         if (atSurface && c.material() == MaterialProfile.MUD && c.mudDepth() == 0 && incoming > 0) return;
         double x = e.getDeltaMovement().x, z = e.getDeltaMovement().z;

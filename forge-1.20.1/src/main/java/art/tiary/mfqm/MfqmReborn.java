@@ -24,6 +24,7 @@ public final class MfqmReborn {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ModBlocks.BLOCKS.register(bus);
         ModItems.ITEMS.register(bus);
+        art.tiary.mfqm.registry.ModTabs.TABS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SinkConfig.SPEC);
         SinkNetwork.register();
         bus.addListener(this::commonSetup);

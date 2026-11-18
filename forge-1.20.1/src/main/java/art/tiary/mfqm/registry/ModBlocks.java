@@ -24,5 +24,12 @@ public final class ModBlocks {
     public static final RegistryObject<Block> SOFT_QUICKSAND = BLOCKS.register("soft_quicksand",
             () -> new SinkingBlock(MaterialProfile.SOFT_QUICKSAND, BlockBehaviour.Properties.copy(Blocks.RED_SAND).strength(1.0F)));
 
+    public static final java.util.Map<String, RegistryObject<Block>> LEGACY = new java.util.LinkedHashMap<>();
+    static {
+        LEGACY.put("quicksand",QUICKSAND); LEGACY.put("mud",MUD); LEGACY.put("soft_quicksand",SOFT_QUICKSAND);
+        for (var spec : art.tiary.mfqm.content.LegacyCatalog.ALL) if (!LEGACY.containsKey(spec.id()))
+            LEGACY.put(spec.id(), BLOCKS.register(spec.id(), () -> art.tiary.mfqm.content.LegacyBlocks.create(spec)));
+    }
+
     private ModBlocks() { }
 }
