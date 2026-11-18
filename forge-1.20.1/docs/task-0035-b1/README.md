@@ -1,4 +1,8 @@
-# Task 003.5-B1 — motion observation, candidate physics and landing
+# MFQM Reborn 003.5-B1
+
+候选运动与落地修复已实现，并完成本文记录的自动化及真实客户端验证。**参数仍待用户玩法验收，间歇性 Y 轴抽搐未被证明修复。**
+
+[中文完成报告](COMPLETION_REPORT.zh-CN.md) · [测试结果](TEST_RESULTS.md) · [专服与延迟结果](NETWORK_RESULTS.md) · [原始证据索引](evidence/INDEX.md)
 
 This branch develops only B-OBS → B-MOTION → B-LANDING for the three core LivingEntity materials. Independent base: merged main79aac86; observation-only checkpointda60f10 contains no physics changes. No boat, geometry, effects, tools, worldgen, AI textures or old private assets are included.
 

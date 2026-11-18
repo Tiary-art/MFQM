@@ -21,7 +21,7 @@ for folder in sys.argv[1:]:
    sounds=[x for x in client_records if x.get('point')=='sound_requested']
    client_ends=[x for x in client_records if x.get('point')=='client_tick_end' and x.get('local_player')
                 and first and x.get('tick',0)>=first['tick']+5 and x.get('y',1000)<=first.get('surface',0)+0.05]
-  rows.append(dict(case=f.stem.rsplit('_',2)[0],samples=len(ends),contact_tick=first['tick'] if first else '',
+  rows.append(dict(case=f.stem.rsplit('_',2)[0],trace_file=f.name,samples=len(ends),contact_tick=first['tick'] if first else '',
     post_contact_ticks=ends[-1]['tick']-first['tick'] if first else '',
     entry_depth=first.get('depth',0) if first else '',
     min_continuous_dy=min(dy) if dy else '',max_continuous_dy=max(dy) if dy else '',
