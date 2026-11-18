@@ -72,4 +72,24 @@ public final class MotionGameTests {
         h.assertTrue(pig.getHealth() < health, "outside fall still causes real vanilla damage");
         pig.discard(); h.succeed();
     }
+    @GameTest(template = "pool_test", timeoutTicks = 100)
+    public static void naturalPigFallsAndEntersWithinDepthBudget(GameTestHelper h) {
+        CoreMaterialGameTests.pool(h, MaterialProfile.QUICKSAND);
+        var pig = h.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, 8, 8.5));
+        pig.setNoAi(false);
+        double start = pig.getY();
+        final boolean[] contact = {false};
+        h.onEachTick(() -> {
+            var c = ContactSampler.sample(h.getLevel(), pig);
+            if (!contact[0] && c.material() != null) {
+                contact[0] = true;
+                h.assertTrue(c.depthBlocks() <= SinkConfig.motionPolicy().entryDepth() + 0.001,
+                        "natural real gravity entry has bounded first penetration");
+            }
+        });
+        h.runAfterDelay(45, () -> {
+            h.assertTrue(contact[0] && pig.getY() < start - 2, "pig actually fell; a floating fixture cannot pass");
+            pig.discard(); h.succeed();
+        });
+    }
 }

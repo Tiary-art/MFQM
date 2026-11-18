@@ -18,7 +18,7 @@ public final class MotionMath {
                 + (moving ? 0.006 : 0) + (struggle ? 0.015 : 0));
     }
     public static double entryStep(double feet, double surface, double proposed, Policy p) {
-        if (!Double.isFinite(proposed)) return 0;
+        if (!Double.isFinite(feet) || !Double.isFinite(surface) || !Double.isFinite(proposed)) return 0;
         return Math.max(proposed, Math.min(0, surface - p.entryDepth() - feet));
     }
     public static double downwardBudget(double elapsedTicks, Policy p) {
