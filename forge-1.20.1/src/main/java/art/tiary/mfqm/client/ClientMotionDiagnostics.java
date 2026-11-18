@@ -45,6 +45,13 @@ public final class ClientMotionDiagnostics {
                 event.phase.name().toLowerCase(java.util.Locale.ROOT), tick, System.nanoTime(), MotionDiagnostics.anonymous(entity.getUUID(), token),
                 mc.level.dimension().location(), entity == mc.player, entity.getY(), dy, entity.getDeltaMovement().y,
                 entity.fallDistance, entity.onGround(), entity.horizontalCollision, entity.verticalCollision, mc.options.keyJump.isDown()));
+        if (entity instanceof net.minecraft.world.entity.LivingEntity living) {
+            var contact = art.tiary.mfqm.physics.ContactSampler.sample(mc.level, living);
+            write(String.format(java.util.Locale.ROOT,
+                    "{\"point\":\"client_contact_%s\",\"side\":\"client\",\"tick\":%d,\"surface\":%.6f,\"depth\":%.6f,\"material\":\"%s\",\"cells\":%d}",
+                    event.phase.name().toLowerCase(java.util.Locale.ROOT), tick, contact.surface(), contact.depthBlocks(),
+                    contact.material() == null ? "none" : contact.material().id, contact.cells()));
+        }
         if (event.phase == TickEvent.Phase.END) {
             previousY = entity.getY(); previousTick = tick;
             if (--remaining <= 0) close();

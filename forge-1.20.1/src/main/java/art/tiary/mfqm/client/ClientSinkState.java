@@ -11,7 +11,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** Read-only replicas and boolean input intents. Never solves motion or deducts air/health. */
+/** Read-only physiological replicas and boolean input intents. Kinematics live in ClientMotionPrediction. */
 @Mod.EventBusSubscriber(modid = MfqmReborn.MOD_ID, value = Dist.CLIENT)
 public final class ClientSinkState {
     private static boolean sentHeld;

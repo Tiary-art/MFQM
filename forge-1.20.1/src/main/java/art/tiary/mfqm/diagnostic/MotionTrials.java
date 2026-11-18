@@ -50,14 +50,10 @@ public final class MotionTrials {
                 }))
                 .then(Commands.literal("suite").then(Commands.argument("phase", StringArgumentType.word()).executes(c -> {
                     var p = c.getSource().getPlayerOrException(); String prefix = StringArgumentType.getString(c, "phase");
-                    if (!validLabel(prefix) || prefix.length() > 20) return 0;
-                    var cases = new ArrayList<Case>();
-                    for (boolean pig : new boolean[]{false, true}) for (var m : MaterialProfile.values())
-                        for (int layers : new int[]{1, 3, 17}) for (int height : new int[]{0, 3, 10}) cases.add(new Case(m.id, layers, height, pig));
-                    SUITES.put(p.getUUID(), new Suite(cases, 0, p.level().getGameTime(), prefix));
-                    p.sendSystemMessage(Component.literal("MFQM motion suite: 54 real-tick fixtures; client must remain connected/unpaused. /mfqm motion stop"));
-                    return 1;
+                    return startSuite(p, prefix, false);
                 })))
+                .then(Commands.literal("pigsuite").then(Commands.argument("phase", StringArgumentType.word()).executes(c ->
+                        startSuite(c.getSource().getPlayerOrException(), StringArgumentType.getString(c, "phase"), true))))
                 .then(Commands.literal("trial").then(Commands.argument("material", StringArgumentType.word())
                         .then(Commands.argument("layers", IntegerArgumentType.integer(1, 17))
                                 .then(Commands.argument("height", IntegerArgumentType.integer(0, 10))
@@ -67,6 +63,18 @@ public final class MotionTrials {
                                                     IntegerArgumentType.getInteger(c, "height"), StringArgumentType.getString(c, "subject").equals("pig")), "manual");
                                             return 1;
                                         }))))))));
+    }
+    private static int startSuite(ServerPlayer p, String prefix, boolean pigsOnly) {
+        if (!validLabel(prefix) || prefix.length() > 20 || !p.isAlive()) return 0;
+        var cases = new ArrayList<Case>();
+        for (boolean pig : new boolean[]{false, true}) {
+            if (pigsOnly && !pig) continue;
+            for (var m : MaterialProfile.values()) for (int layers : new int[]{1, 3, 17})
+                for (int height : new int[]{0, 3, 10}) cases.add(new Case(m.id, layers, height, pig));
+        }
+        SUITES.put(p.getUUID(), new Suite(cases, 0, p.level().getGameTime(), prefix));
+        p.sendSystemMessage(Component.literal("MFQM motion suite: " + cases.size() + " real-tick fixtures; remain connected/unpaused. /mfqm motion stop"));
+        return 1;
     }
     private static boolean validLabel(String label) { return label.matches("[A-Za-z0-9_-]{1,64}"); }
     @SubscribeEvent public static void tick(TickEvent.LevelTickEvent event) {
@@ -86,6 +94,10 @@ public final class MotionTrials {
         }
     }
     private static void run(ServerPlayer player, Case c, String prefix) {
+        if (!player.isAlive()) {
+            player.sendSystemMessage(Component.literal("Respawn before starting a motion fixture; dead-player trials are invalid."));
+            return;
+        }
         boolean stone = c.material.equals("stone"), water = c.material.equals("water");
         var profile = MaterialProfile.byId(c.material);
         if (profile == null && !stone && !water) return;
@@ -109,7 +121,7 @@ public final class MotionTrials {
         if (c.pig) {
             player.connection.teleport(8.5, 65, 0.5, 90, 20);
             var pig = EntityType.PIG.create(level); if (pig == null) return;
-            pig.setNoAi(true); pig.moveTo(0.5, surface + c.height + 0.01, 0.5, 0, 0); level.addFreshEntity(pig); target = pig;
+            pig.setNoAi(false); pig.moveTo(0.5, surface + c.height + 0.01, 0.5, 0, 0); level.addFreshEntity(pig); target = pig;
         } else player.connection.teleport(0.5, surface + c.height + 0.01, 0.5, 0, 30);
         target.fallDistance = 0; target.setDeltaMovement(Vec3.ZERO);
         if (target == player) player.connection.send(new ClientboundSetEntityMotionPacket(player));
