@@ -30,6 +30,9 @@ public final class ClientSinkState {
         data.stuck = (int) SinkMath.clamp(packet.stuck(), 0, 175);
         data.air = (int) SinkMath.clamp(packet.air(), -1, 300);
         data.eyeCovered = packet.eyes();
+        data.residueType = MaterialProfile.byId(packet.residueType()) == null ? "" : packet.residueType();
+        data.residueTicks = (int)SinkMath.clamp(packet.residueTicks(),0,10000);
+        if(living==mc.player) living.setAirSupply(Math.max(0,data.air));
         data.settlements = Math.max(0, packet.settlements());
         if (Boolean.getBoolean("mfqm.traceSnapshots") && living == mc.player) {
             MfqmReborn.LOGGER.info("MFQM_SYNC_CLIENT {} {} {} {} {} {} {}", packet.uuid(), packet.tick(),

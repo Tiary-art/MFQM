@@ -29,6 +29,7 @@ public final class SinkState {
     public boolean wasActive;
     public String residueType = "";
     public int residueTicks;
+    public int lastSyncedResidue;
     public TraceSession trace;
     public long motionCorrections;
     public String correctionReason = "none";

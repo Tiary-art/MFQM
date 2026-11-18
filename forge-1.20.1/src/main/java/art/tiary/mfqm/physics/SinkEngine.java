@@ -62,11 +62,13 @@ public final class SinkEngine {
         }
         if (data.hasPrevious && !entity.isPassenger() && entity instanceof ServerPlayer player && SinkNetwork.connected(player)) {
             reconcilePlayer(player, data);
-        } else if (data.active() && data.hasPrevious && entity.isPassenger()
+        } else if (data.active() && data.hasPrevious && entity.isPassenger() && !(entity.getVehicle() instanceof net.minecraft.world.entity.vehicle.Boat)
                 && entity instanceof ServerPlayer player && SinkNetwork.connected(player)) {
             reconcileMountedLegacy(player, data);
         }
         var contact = ContactSampler.sample(level, entity);
+        if (entity.getVehicle() instanceof net.minecraft.world.entity.vehicle.Boat)
+            contact = new ContactSampler.Contact(null, 0, 0, 0, 0, 0, contact.eyes(), 0, 0);
         if (contact.material() == null) {
             data.leaveContact();
             removeModifier(entity);
@@ -100,9 +102,20 @@ public final class SinkEngine {
         data.eyeCovered = contact.eyes();
         boolean oxygen = entity instanceof Player ? SinkConfig.PLAYER_OXYGEN.get() : SinkConfig.MOB_OXYGEN.get();
         data.air = (int) SinkMath.clamp(data.air, -1, 300);
-        if (data.eyeCovered && oxygen) data.air = Math.max(-1, data.air - 1);
-        else data.air = oxygen ? Math.min(300, data.air + 5) : 300;
-        if (data.eyeCovered && (!oxygen || data.air < 0) && time % 16 == 0 && data.lastDamageTick != time) {
+        boolean protectedBreathing = net.minecraft.world.effect.MobEffectUtil.hasWaterBreathing(entity);
+        if (data.eyeCovered && oxygen) {
+            data.air = Math.min(data.air, entity.getAirSupply());
+            int respiration = net.minecraft.world.item.enchantment.EnchantmentHelper.getRespiration(entity);
+            if (!protectedBreathing && (respiration == 0 || entity.getRandom().nextInt(respiration+1)==0)) data.air = Math.max(-1,data.air-1);
+            entity.setAirSupply(Math.max(0,data.air));
+        } else if (entity.isEyeInFluid(net.minecraft.tags.FluidTags.WATER)) {
+            data.air = Math.max(-1,entity.getAirSupply());
+        } else {
+            boolean recovering = data.air < 300;
+            data.air = oxygen ? Math.min(300,data.air+5) : 300;
+            if (recovering) entity.setAirSupply(Math.max(0,data.air));
+        }
+        if (data.eyeCovered && !protectedBreathing && (!oxygen || data.air < 0) && time % 16 == 0 && data.lastDamageTick != time) {
             data.lastDamageTick = time;
             if (oxygen) data.air = 0;
             float damage = (float) (Math.max(entity.getMaxHealth() * 0.1, 2) * SinkConfig.DAMAGE_MULTIPLIER.get());
@@ -111,7 +124,9 @@ public final class SinkEngine {
                 entity.hurt(entity.damageSources().drown(), damage);
             }
         }
-        if (!data.active() && data.residueTicks > 0) data.residueTicks--;
+        if (entity.isInWaterOrRain()) data.residueTicks = Math.max(0,data.residueTicks-50);
+        else if (!data.active() && data.residueTicks > 0) data.residueTicks--;
+        art.tiary.mfqm.content.MaterialEffects.tick(level,entity,data,before,time);
         finish(entity, data, before, time);
     }
 
@@ -169,9 +184,10 @@ public final class SinkEngine {
         data.previousX = entity.getX(); data.previousY = entity.getY(); data.previousZ = entity.getZ();
         data.hasPrevious = true;
         if (before != data.active() || (data.active() || data.air < 300) && time % 5 == 0
-                || data.air == 300 && data.lastSyncedAir != 300) {
+                || data.air == 300 && data.lastSyncedAir != 300 || (data.residueTicks > 0 || data.lastSyncedResidue > 0) && time % 20 == 0) {
             SinkNetwork.sync(entity, data);
             data.lastSyncedAir = data.air;
+            data.lastSyncedResidue = data.residueTicks;
         }
         data.wasActive = data.active();
         if (data.trace != null) data.trace.record(entity, data, time);

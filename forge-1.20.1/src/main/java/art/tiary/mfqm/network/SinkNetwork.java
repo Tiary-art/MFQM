@@ -20,7 +20,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class SinkNetwork {
-    private static final String VERSION = "2-b1";
+    private static final String VERSION = "3-b2";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(MfqmReborn.MOD_ID, "sink"), () -> VERSION, VERSION::equals, VERSION::equals);
     private SinkNetwork() { }
@@ -41,15 +41,15 @@ public final class SinkNetwork {
     }
 
     public record Snapshot(int entityId, UUID uuid, ResourceLocation dimension, long tick, String material,
-                           float immersion, int stuck, int air, boolean eyes, long settlements) {
+                           float immersion, int stuck, int air, boolean eyes, long settlements, String residueType, int residueTicks) {
         static void encode(Snapshot msg, FriendlyByteBuf buf) {
             buf.writeVarInt(msg.entityId); buf.writeUUID(msg.uuid); buf.writeResourceLocation(msg.dimension);
             buf.writeLong(msg.tick); buf.writeUtf(msg.material, 32); buf.writeFloat(msg.immersion);
-            buf.writeVarInt(msg.stuck); buf.writeVarInt(msg.air); buf.writeBoolean(msg.eyes); buf.writeLong(msg.settlements);
+            buf.writeVarInt(msg.stuck); buf.writeVarInt(msg.air); buf.writeBoolean(msg.eyes); buf.writeLong(msg.settlements); buf.writeUtf(msg.residueType,32); buf.writeVarInt(msg.residueTicks);
         }
         static Snapshot decode(FriendlyByteBuf buf) {
             return new Snapshot(buf.readVarInt(), buf.readUUID(), buf.readResourceLocation(), buf.readLong(),
-                    buf.readUtf(32), buf.readFloat(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readLong());
+                    buf.readUtf(32), buf.readFloat(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readLong(), buf.readUtf(32), buf.readVarInt());
         }
         static void handle(Snapshot msg, Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientSinkState.accept(msg));
@@ -80,7 +80,7 @@ public final class SinkNetwork {
     public static Snapshot snapshot(LivingEntity entity, SinkState state) {
         return new Snapshot(entity.getId(), entity.getUUID(), entity.level().dimension().location(),
                 entity.level().getGameTime(), state.active() ? state.material.id : "none", (float) state.immersion,
-                state.stuck, state.air, state.eyeCovered, state.settlements);
+                state.stuck, state.air, state.eyeCovered, state.settlements, state.residueType, state.residueTicks);
     }
 
     public static void sync(LivingEntity entity, SinkState state) {
