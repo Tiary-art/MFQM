@@ -77,6 +77,20 @@ public final class MotionTrials {
         return 1;
     }
     private static boolean validLabel(String label) { return label.matches("[A-Za-z0-9_-]{1,64}"); }
+    private static void release(ServerPlayer player) {
+        SUITES.remove(player.getUUID());
+        var old = FIXTURES.remove(player.getUUID());
+        if (old != null) {
+            MotionDiagnostics.stop(old);
+            if (old != player) old.discard();
+        }
+    }
+    @SubscribeEvent public static void logout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) release(player);
+    }
+    @SubscribeEvent public static void stopped(net.minecraftforge.event.server.ServerStoppedEvent event) {
+        SUITES.clear(); FIXTURES.clear();
+    }
     @SubscribeEvent public static void tick(TickEvent.LevelTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.level.isClientSide || SUITES.isEmpty()) return;
         for (var player : event.level.players()) {
@@ -84,7 +98,7 @@ public final class MotionTrials {
             var suite = SUITES.get(p.getUUID());
             if (suite == null || event.level.getGameTime() < suite.next) continue;
             if (suite.index >= suite.cases.size()) {
-                SUITES.remove(p.getUUID());
+                release(p);
                 p.connection.teleport(8.5, 65, 0.5, 0, 30);
                 p.sendSystemMessage(Component.literal("MFQM motion suite completed (records require analysis, not automatic acceptance)."));
                 MfqmReborn.LOGGER.info("MFQM_B1_SUITE_END {}", suite.prefix); continue;
