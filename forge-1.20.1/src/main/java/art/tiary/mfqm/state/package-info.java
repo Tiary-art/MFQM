@@ -1,2 +1,2 @@
-/** Future entity capabilities and persistence; not implemented in Task 002. */
+/** Entity capabilities: transient sinking/oxygen, versioned persistent residue, and lifecycle cleanup. */
 package art.tiary.mfqm.state;

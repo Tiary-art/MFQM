@@ -1,3 +1,6 @@
 {
-  "block.mfqm.dev_test_block": "MFQM 开发测试方块（无陷落物理）"
+  "block.mfqm.dev_test_block": "MFQM 开发测试方块（无陷落物理）",
+  "block.mfqm.quicksand": "普通流沙（核心近似）",
+  "block.mfqm.mud": "泥浆（核心近似）",
+  "block.mfqm.soft_quicksand": "松软流沙（核心近似）"
 }

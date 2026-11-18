@@ -1,3 +1,6 @@
 {
-  "block.mfqm.dev_test_block": "MFQM Development Test Block (No Sinking Physics)"
+  "block.mfqm.dev_test_block": "MFQM Development Test Block (No Sinking Physics)",
+  "block.mfqm.quicksand": "Quicksand (Core Approximation)",
+  "block.mfqm.mud": "Mud (Core Approximation)",
+  "block.mfqm.soft_quicksand": "Soft Quicksand (Core Approximation)"
 }
