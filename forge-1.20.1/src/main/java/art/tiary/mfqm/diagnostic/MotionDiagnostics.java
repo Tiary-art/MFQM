@@ -47,6 +47,16 @@ public final class MotionDiagnostics {
         if (session != null) session.close();
     }
     public static boolean enabled(LivingEntity target) { return SESSIONS.containsKey(target); }
+    @SubscribeEvent public static void leave(net.minecraftforge.event.entity.EntityLeaveLevelEvent event) {
+        if (event.getEntity() instanceof LivingEntity living) stop(living);
+    }
+    @SubscribeEvent public static void logout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
+        stop(event.getEntity());
+    }
+    @SubscribeEvent public static void stopped(net.minecraftforge.event.server.ServerStoppedEvent event) {
+        for (var session : SESSIONS.values()) session.close();
+        SESSIONS.clear();
+    }
     public static void point(LivingEntity target, String point) {
         var session = SESSIONS.get(target);
         if (session != null) session.sample(target, point);
@@ -162,7 +172,11 @@ public final class MotionDiagnostics {
             drain();
             if (connectionOwner != null) {
                 var channel = connectionOwner.connection.connection.channel();
-                channel.eventLoop().execute(() -> { if (channel.pipeline().get("mfqm_diag_" + token) != null) channel.pipeline().remove("mfqm_diag_" + token); });
+                try {
+                    channel.eventLoop().execute(() -> { if (channel.pipeline().get("mfqm_diag_" + token) != null) channel.pipeline().remove("mfqm_diag_" + token); });
+                } catch (java.util.concurrent.RejectedExecutionException ignored) {
+                    // A closed channel has no future packet traffic to observe.
+                }
             }
             try { writer.close(); } catch (IOException ignored) { }
         }
