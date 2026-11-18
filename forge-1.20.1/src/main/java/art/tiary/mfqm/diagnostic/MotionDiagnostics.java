@@ -48,10 +48,10 @@ public final class MotionDiagnostics {
     }
     public static boolean enabled(LivingEntity target) { return SESSIONS.containsKey(target); }
     @SubscribeEvent public static void leave(net.minecraftforge.event.entity.EntityLeaveLevelEvent event) {
-        if (event.getEntity() instanceof LivingEntity living) stop(living);
+        if (!event.getLevel().isClientSide && event.getEntity() instanceof LivingEntity living) stop(living);
     }
     @SubscribeEvent public static void logout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
-        stop(event.getEntity());
+        if (!event.getEntity().level().isClientSide) stop(event.getEntity());
     }
     @SubscribeEvent public static void stopped(net.minecraftforge.event.server.ServerStoppedEvent event) {
         for (var session : SESSIONS.values()) session.close();
@@ -65,10 +65,12 @@ public final class MotionDiagnostics {
         if (!event.player.level().isClientSide && event.phase == TickEvent.Phase.START) point(event.player, "player_tick_start");
     }
     @SubscribeEvent public static void fall(LivingFallEvent event) {
+        if (event.getEntity().level().isClientSide) return;
         var s = SESSIONS.get(event.getEntity());
         if (s != null) s.event("fall_event", "distance=" + event.getDistance() + ";multiplier=" + event.getDamageMultiplier());
     }
     @SubscribeEvent public static void hurt(LivingHurtEvent event) {
+        if (event.getEntity().level().isClientSide) return;
         var s = SESSIONS.get(event.getEntity());
         if (s != null) s.event("hurt_event", event.getSource().getMsgId() + ";amount=" + event.getAmount());
     }
