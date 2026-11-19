@@ -46,9 +46,10 @@ public final class LegacyFluids {
         }
         @Override public void initializeClient(java.util.function.Consumer<IClientFluidTypeExtensions> consumer) {
             consumer.accept(new IClientFluidTypeExtensions() {
-                @Override public ResourceLocation getStillTexture() { return new ResourceLocation("minecraft","block/water_still"); }
-                @Override public ResourceLocation getFlowingTexture() { return new ResourceLocation("minecraft","block/water_flow"); }
+                @Override public ResourceLocation getStillTexture() { return art.tiary.mfqm.client.OriginalTextureBindings.fluid(spec.id(), false); }
+                @Override public ResourceLocation getFlowingTexture() { return art.tiary.mfqm.client.OriginalTextureBindings.fluid(spec.id(), true); }
                 @Override public int getTintColor() {
+                    if (art.tiary.mfqm.client.OriginalTextureBindings.hasFluid(spec.id())) return 0xffffffff;
                     return switch(spec.id()) { case "acid"->0xffa0bd37;case "honey"->0xffc18c27;case "liquid_chocolate"->0xff613923;
                         case "tar"->0xff272627;case "sinking_slime","mucus"->0xff71964b;case "dry_quicksand"->0xffd4c58f;
                         default->0xff6e6443; };

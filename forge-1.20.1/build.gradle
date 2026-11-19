@@ -27,6 +27,7 @@ minecraft {
                 workingDirectory project.file('run/' + (project.findProperty('phase8Name') ?: 'Phase8One'))
                 args '--username', (project.findProperty('phase8Name') ?: 'Phase8One'), '--quickPlayMultiplayer', '127.0.0.1:25589'
                 property 'mfqm.phase8ClientTrace', 'true'
+                if (project.hasProperty('phase9ProbeDir')) property 'mfqm.phase9ProbeDir', project.property('phase9ProbeDir')
             }
         }
         observer {
@@ -72,4 +73,24 @@ tasks.named('jar', Jar).configure {
 // Forward console commands (including stop) to the development dedicated server.
 tasks.withType(JavaExec).configureEach {
     if (name == 'runServer') { standardInput = System.in }
+}
+
+// Phase9 private assets are opt-in generated output, never a public source/resource dependency.
+def originalAssets = providers.gradleProperty('mfqmOriginalAssets').orNull
+tasks.named('processResources', ProcessResources).configure {
+    inputs.property 'mfqmResourceMode', originalAssets == null ? 'PUBLIC_SOURCE_BUILD' : 'PRIVATE_ORIGINAL_ASSETS_BUILD'
+    if (originalAssets != null) inputs.dir(file(originalAssets))
+    doFirst {
+        if (originalAssets != null && !new File(file(originalAssets), '.mfqm-import-manifest.json').isFile())
+            throw new GradleException('Private assets require the registered importer manifest')
+        // Prevent a previous private build leaking PNGs into the next public output when modes switch.
+        delete destinationDir
+    }
+    doLast {
+        if (originalAssets != null) {
+            copy { from(originalAssets); into(destinationDir); exclude '.mfqm-import-manifest.json' }
+        } else if (!fileTree(destinationDir).matching { include '**/*.png', '**/*.ogg' }.isEmpty()) {
+            throw new GradleException('PUBLIC_SOURCE_BUILD must not include private PNG/OGG')
+        }
+    }
 }
