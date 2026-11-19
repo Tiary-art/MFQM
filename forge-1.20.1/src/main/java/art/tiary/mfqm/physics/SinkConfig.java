@@ -11,7 +11,7 @@ public final class SinkConfig {
     public static MotionMath.Policy motionPolicy() {
         return new MotionMath.Policy(ENTRY_DEPTH.get(), TERMINAL.get(), DEPTH_GAIN.get(), QS_BASE.get(), MUD_BASE.get(), SOFT_BASE.get(), MOVING_EXTRA.get(), STRUGGLE_EXTRA.get(), ENTRY_DAMPING.get());
     }
-    public static final ForgeConfigSpec.BooleanValue EXPERIMENTAL_STUCK, PHASE7_TEST_WORLD, PHASE7_DIAGNOSTICS;
+    public static final ForgeConfigSpec.BooleanValue EXPERIMENTAL_STUCK, PHASE7_TEST_WORLD, PHASE7_DIAGNOSTICS, ORIGINAL_CONTACTS;
     static {
         var builder = new ForgeConfigSpec.Builder();
         PLAYER_OXYGEN = builder.comment("Use the separate 300-tick oxygen reservoir for players.")
@@ -41,6 +41,7 @@ public final class SinkConfig {
         EXPERIMENTAL_STUCK = builder.comment("Experimental injected Stuck contacts only; no material Level approximation.").define("stuckLease", false);
         PHASE7_TEST_WORLD = builder.comment("Allow destructive test commands only in a backed-up MFQM_PHASE7_ named world.").define("testWorld", false);
         PHASE7_DIAGNOSTICS = builder.define("diagnostics", false);
+        ORIGINAL_CONTACTS = builder.comment("Phase8: original Quicksand contact projection, non-player living entities only; players and other materials BLOCKED.").define("originalQuicksandContacts", false);
         builder.pop();
         SPEC = builder.build();
     }
