@@ -1,0 +1,9 @@
+{
+  "jar_build_path": "forge-1.20.1/build/libs/mfqm-reborn-0.0.3.5-b2-candidate.jar",
+  "download_copy": "/workspace/outputs/MFQM-Phase8/mfqm-reborn-phase8-controlled.jar",
+  "sha256": "1480c2746cdc64fb93563e652114769cbf0501a24baf71473c0469e3ce001a77",
+  "manifest_version_note": "Project retains old candidate version string; identify Phase8 by PR commit and SHA, not filename alone",
+  "packaged_jar_runtime": "BUILD_ONLY; GameTest and live clients used Forge dev classpaths",
+  "baseline_commit": "b1461ba983d4e9c6ca8c20f3d784d04390db6b36",
+  "original_jar_distributed": false
+}

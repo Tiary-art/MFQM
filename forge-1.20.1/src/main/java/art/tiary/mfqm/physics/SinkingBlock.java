@@ -9,7 +9,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** Blocks supply shapes only. All physiological and motion effects are settled centrally. */
+/** Shapes plus a default-off evidence-gated Contact callback; motion/physiology remain centrally settled. */
 public class SinkingBlock extends Block implements SinkingMedium {
     private final MaterialProfile profile;
 
@@ -17,6 +17,11 @@ public class SinkingBlock extends Block implements SinkingMedium {
         super(properties.noOcclusion().dynamicShape().isSuffocating((s, l, p) -> false)
                 .isViewBlocking((s, l, p) -> false));
         this.profile = profile;
+    }
+
+    @Override
+    public void entityInside(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.Entity entity) {
+        art.tiary.mfqm.integration.OriginalContactBridge.inside(state, level, pos, entity);
     }
 
     public double motionScale() { return 1; }

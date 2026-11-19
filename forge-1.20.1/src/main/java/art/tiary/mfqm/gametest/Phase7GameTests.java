@@ -27,6 +27,9 @@ public final class Phase7GameTests {
         var speed = pig.getAttribute(Attributes.MOVEMENT_SPEED);
         UUID foreign = UUID.fromString("00000000-0000-0000-0000-000000000123");
         speed.addTransientModifier(new AttributeModifier(foreign, "foreign control", .2, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        var frames = StuckAdapter.observeForTest(pig);
+        long initialTick = h.getLevel().getGameTime();
+        MfqmReborn.LOGGER.info("PHASE8_LEASE_SETUP enabled={} alive={} exempt={}",StuckAdapter.enabled(),pig.isAlive(),SinkEngine.exempt(pig));
         StuckAdapter.contact(pig, 145);
         StuckAdapter.contact(pig, 128);
         StuckAdapter.update(pig);
@@ -35,7 +38,8 @@ public final class Phase7GameTests {
         h.assertTrue(Math.abs(speed.getModifier(StuckLease.UUID_KEY).getAmount() - expected) < 1e-12, "last contact wins");
         h.assertTrue(speed.getModifier(SinkEngine.SLOWNESS_ID) == null, "no old UUID stacking");
         h.assertTrue(!speed.save().toString().contains(StuckLease.UUID_KEY.toString()), "lease not persisted");
-        h.runAfterDelay(3, () -> {
+        h.runAfterDelay(2, () -> {
+            h.assertTrue(frames.stream().anyMatch(f -> f.tick() == initialTick + 1 && f.level() == -1 && !f.modifierPresent()), "exact next world END release history");
             h.assertTrue(speed.getModifier(StuckLease.UUID_KEY) == null, "no-contact release via real level END: " + StuckAdapter.diagnosticState(pig));
             h.assertTrue(speed.getModifier(foreign) != null, "foreign UUID retained");
             StuckAdapter.contact(pig, 255);
@@ -115,11 +119,17 @@ public final class Phase7GameTests {
         SinkConfig.EXPERIMENTAL_STUCK.set(true);
         var pig = h.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.5, 7, 8.5));
         MfqmReborn.LOGGER.info("PHASE7_HOLD_TEST_ENTITY {}", pig.getUUID());
+        var holdFrames = StuckAdapter.observeForTest(pig);
+        long holdStart = h.getLevel().getGameTime();
         StuckAdapter.holdForTest(pig, 145, 2);
         StuckAdapter.update(pig);
-        h.runAfterDelay(1, () -> h.assertTrue(pig.getAttribute(Attributes.MOVEMENT_SPEED).getModifier(StuckLease.UUID_KEY) != null, "bounded script renews lease " + StuckAdapter.diagnosticState(pig)));
+        // Check actual END snapshots, not an ambiguously phased intermediate GameTest callback.
+
         h.runAfterDelay(4, () -> {
             h.assertTrue(pig.getAttribute(Attributes.MOVEMENT_SPEED).getModifier(StuckLease.UUID_KEY) == null, "script expires without persistent data");
+            h.assertTrue(holdFrames.stream().anyMatch(f -> f.tick() == holdStart && f.remaining() == 1 && f.modifierPresent()), "first hold update");
+            h.assertTrue(holdFrames.stream().anyMatch(f -> f.tick() == holdStart + 1 && f.remaining() == 0 && f.modifierPresent()), "second hold update at next world tick");
+            h.assertTrue(holdFrames.stream().anyMatch(f -> f.tick() == holdStart + 2 && f.level() == -1 && !f.modifierPresent()), "release at exact following world tick");
             StuckAdapter.clear(pig); SinkConfig.EXPERIMENTAL_STUCK.set(false); pig.discard(); h.succeed();
         });
     }

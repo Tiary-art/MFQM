@@ -16,11 +16,15 @@ import net.minecraftforge.fml.common.Mod;
 public final class Phase7Commands {
     private Phase7Commands() { }
     private static boolean safe(CommandSourceStack s) {
-        return SinkConfig.PHASE7_TEST_WORLD.get()
-                && s.getServer().getWorldData().getLevelName().startsWith("MFQM_PHASE7_");
+        return !StuckAdapter.forcedDisabled() && SinkConfig.PHASE7_TEST_WORLD.get()
+                && (s.getServer().getWorldData().getLevelName().startsWith("MFQM_PHASE7_") || s.getServer().getWorldData().getLevelName().startsWith("MFQM_PHASE8_"));
     }
     @SubscribeEvent public static void register(RegisterCommandsEvent e) {
         e.getDispatcher().register(Commands.literal("mfqm_phase7").requires(s -> s.hasPermission(2))
+            .then(Commands.literal("disable").executes(c -> {
+                StuckAdapter.disableAll();
+                c.getSource().sendSuccess(() -> Component.literal("Experimental contact/lease/test-world entries disabled; owned leases cleared. Existing terrain is not rolled back."), true); return 1;
+            }))
             .then(Commands.literal("release").executes(c -> {
                 StuckAdapter.clear(c.getSource().getPlayerOrException()); return 1;
             }))

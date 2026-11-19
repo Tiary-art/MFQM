@@ -21,10 +21,10 @@ public final class CoreSinkingBlock extends SinkingBlock {
     private BlockState filled(BlockState s, BlockGetter l, BlockPos p) { return s.setValue(FILLED, l.getBlockState(p.above()).is(this)); }
     @Override public BlockState getStateForPlacement(BlockPlaceContext c) { return filled(defaultBlockState(),c.getLevel(),c.getClickedPos()); }
     @Override public BlockState updateShape(BlockState s, Direction d, BlockState n, LevelAccessor l, BlockPos p, BlockPos np) {
-        return d == Direction.UP ? filled(s,l,p) : s;
+        return d == Direction.UP ? s.setValue(FILLED, n.is(this)) : s;
     }
     @Override public double surfaceHeight(BlockState s, BlockGetter l, BlockPos p) {
-        return profile() == MaterialProfile.SOFT_QUICKSAND && l.getBlockState(p.above()).is(this) ? 1 : profile().surfaceHeight;
+        return profile() == MaterialProfile.SOFT_QUICKSAND && s.getValue(FILLED) ? 1 : profile().surfaceHeight;
     }
     @Override public void randomTick(BlockState state, ServerLevel l, BlockPos p, RandomSource random) {
         // Legacy: liquids adjacent inhibit movement; lava hardens sand. Never load a new chunk.

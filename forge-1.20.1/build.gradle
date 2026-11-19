@@ -22,7 +22,13 @@ minecraft {
             if (project.hasProperty('sourceRevision')) property 'mfqm.sourceRevision', project.property('sourceRevision')
             mods { mfqm { source sourceSets.main } }
         }
-        client { }
+        client {
+            if (project.hasProperty('phase8Connect')) {
+                workingDirectory project.file('run/' + (project.findProperty('phase8Name') ?: 'Phase8One'))
+                args '--username', (project.findProperty('phase8Name') ?: 'Phase8One'), '--quickPlayMultiplayer', '127.0.0.1:25589'
+                property 'mfqm.phase8ClientTrace', 'true'
+            }
+        }
         observer {
             parent runs.client
             workingDirectory project.file('run/observer')
