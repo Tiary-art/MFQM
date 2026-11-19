@@ -46,7 +46,7 @@ public final class MotionRuntime {
         // Shallow mud's solid half-height landing/jump remains vanilla geometry.
         if (atSurface && c.material() == MaterialProfile.MUD && c.mudDepth() == 0 && incoming > 0) return;
         double x = e.getDeltaMovement().x, z = e.getDeltaMovement().z;
-        if (e.level().isClientSide && atSurface) {
+        if (e.level().isClientSide && atSurface && !art.tiary.mfqm.integration.StuckAdapter.managed(e)) {
             var result = SinkMath.solve(c.material(), new SinkMath.Motion(x, vy, z), c.immersion(), c.depthBlocks(),
                     c.centerX(), c.centerZ(), Math.hypot(x, z) > 0.0015, jumping, e.onGround());
             x = result.motion().x(); z = result.motion().z();

@@ -29,7 +29,10 @@ minecraft {
             args '--username', 'Observer'
         }
         server { args '--nogui' }
-        gameTestServer { }
+        gameTestServer {
+            workingDirectory project.file(project.findProperty("phase7GameTestDir") ?: "run/gameTestServer")
+            property 'mfqm.phase7Vectors', project.file('src/test/resources/phase6').absolutePath
+        }
     }
 }
 

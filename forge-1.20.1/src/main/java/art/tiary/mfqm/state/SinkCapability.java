@@ -54,6 +54,7 @@ public final class SinkCapability {
         @Override public CompoundTag serializeNBT() { return state.save(); }
         @Override public void deserializeNBT(CompoundTag nbt) { state.load(nbt); }
         void invalidate() {
+            art.tiary.mfqm.integration.StuckAdapter.clear(owner);
             art.tiary.mfqm.physics.SinkEngine.removeModifier(owner);
             state.resetTransient();
             optional.invalidate();
