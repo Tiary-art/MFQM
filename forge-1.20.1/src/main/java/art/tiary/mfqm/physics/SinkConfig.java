@@ -11,6 +11,7 @@ public final class SinkConfig {
     public static MotionMath.Policy motionPolicy() {
         return new MotionMath.Policy(ENTRY_DEPTH.get(), TERMINAL.get(), DEPTH_GAIN.get(), QS_BASE.get(), MUD_BASE.get(), SOFT_BASE.get(), MOVING_EXTRA.get(), STRUGGLE_EXTRA.get(), ENTRY_DAMPING.get());
     }
+    public static final ForgeConfigSpec.BooleanValue EXPERIMENTAL_STUCK, PHASE7_TEST_WORLD, PHASE7_DIAGNOSTICS;
     static {
         var builder = new ForgeConfigSpec.Builder();
         PLAYER_OXYGEN = builder.comment("Use the separate 300-tick oxygen reservoir for players.")
@@ -35,6 +36,11 @@ public final class SinkConfig {
         MOVING_EXTRA = builder.defineInRange("movingExtra", .001, 0, .05);
         STRUGGLE_EXTRA = builder.defineInRange("struggleExtra", .002, 0, .05);
         ENTRY_DAMPING = builder.comment("Fraction of residual downward momentum, for the first three contact ticks only.").defineInRange("entryDamping", .08, 0, 1);
+        builder.pop();
+        builder.push("phase7");
+        EXPERIMENTAL_STUCK = builder.comment("Experimental injected Stuck contacts only; no material Level approximation.").define("stuckLease", false);
+        PHASE7_TEST_WORLD = builder.comment("Allow destructive test commands only in a backed-up MFQM_PHASE7_ named world.").define("testWorld", false);
+        PHASE7_DIAGNOSTICS = builder.define("diagnostics", false);
         builder.pop();
         SPEC = builder.build();
     }

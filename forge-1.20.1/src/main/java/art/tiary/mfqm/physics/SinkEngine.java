@@ -91,11 +91,13 @@ public final class SinkEngine {
             var v = result.motion();
             double vertical = entity.isPassenger() ? v.y() : Math.max(-SinkConfig.motionPolicy().terminal(), MotionMath.velocity(data.material, contact.depthBlocks(), moving, struggle, SinkConfig.motionPolicy()) * contact.motionScale());
             data.lastVertical = vertical;
-            entity.setDeltaMovement(v.x(), vertical, v.z());
+            boolean legacyLease = art.tiary.mfqm.integration.StuckAdapter.managed(entity);
+            entity.setDeltaMovement(legacyLease ? velocity.x : v.x(), vertical, legacyLease ? velocity.z : v.z());
             entity.hasImpulse = !(entity instanceof ServerPlayer) || entity.isPassenger();
             // Preserve Task 003's mounted LivingEntity fallback; B1 makes no boat/rider fix.
             if (entity.isPassenger()) entity.fallDistance = 0;
-            setModifier(entity, result.speedFactor());
+            if (legacyLease) removeModifier(entity);
+            else setModifier(entity, result.speedFactor());
             if (entity.isPassenger() && entity instanceof ServerPlayer player && player.connection != null) {
                 player.connection.send(new ClientboundSetEntityMotionPacket(entity));
             }
