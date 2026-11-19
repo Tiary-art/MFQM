@@ -21,15 +21,20 @@ for phase in ['6','7']:row(phase,'separate install JAR','','NOT_REQUIRED','Task/
 row('8','previous workspace-only JAR','','SUPERSEDED','PR15/edeb2f1 fixed the earlier absence; current deliverables/phase8 is tracked',severity='PREVIOUS_HIGH_FIXED')
 row('8','version-string risk','deliverables/phase8/mfqm-reborn-phase8-controlled.jar','PRESENT_VERIFIED','Contains actual Phase8 classes despite old B2 candidate version string; Phase9 uses a new version',severity='MEDIUM_LABEL_ONLY')
 for phase,path in [('6','forge-1.20.1/src/main/java/art/tiary/mfqm/legacy/StuckLease.java'),('6','forge-1.20.1/src/main/java/art/tiary/mfqm/legacy/DryQuicksandCore.java'),('7','forge-1.20.1/src/main/java/art/tiary/mfqm/integration/StuckAdapter.java'),('8','forge-1.20.1/src/main/java/art/tiary/mfqm/integration/OriginalContactBridge.java')]:row(phase,'current implementation',path,evidence='Current code exists; Phase9 tests compare baseline/candidate, not a claim full legacy physics restored')
+# Cross-check the current assembly, configs/resources/tests and earlier gameplay delivery reports.
+for path in sorted(tracked):
+ if path.startswith(('forge-1.20.1/src/','forge-1.20.1/tools/','forge-1.20.1/docs/','deliverables/task-'))or path in ['forge-1.20.1/build.gradle','forge-1.20.1/gradle.properties','forge-1.20.1/settings.gradle','forge-1.20.1/TASK_002_REPORT.md','forge-1.20.1/TASK_003_REPORT.md']:
+  row('historical/current-assembly','source/config/resource/test/report/tool',path,evidence='Tracked current assembly; source/content check, not historical runtime parity')
 with(D/'HISTORICAL_DELIVERY_AUDIT.csv').open('w',newline='')as f:
  w=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n');w.writeheader();w.writerows(rows)
 # Current hash manifests: detect actual missing/mismatched entries without rewriting old reports.
 manifests=[]
-for p in [R/'research/task-001/SHA256SUMS.txt',*sorted((R/'research').glob('original-phase*/SHA256SUMS')),*sorted((R/'docs').glob('phase[6-8]/SHA256SUMS'))]:
- result={'path':str(p.relative_to(R)),'files':0,'missing':[],'mismatched':[]}
+for p in sorted(R/path for path in tracked if Path(path).name in ['SHA256SUMS','SHA256SUMS.txt']and not path.startswith(('docs/phase9/','deliverables/phase9/'))):
+ base=p.parent.parent if p==R/'forge-1.20.1/docs/task-0035-audit/evidence/SHA256SUMS'else p.parent
+ result={'path':str(p.relative_to(R)),'relative_base':str(base.relative_to(R)),'files':0,'missing':[],'mismatched':[]}
  for l in p.read_text().splitlines():
   if not l.strip()or l.startswith('#'):continue
-  digest,name=l.split('  ',1);target=p.parent/name;result['files']+=1
+  digest,name=l.split('  ',1);target=base/name;result['files']+=1
   if not target.is_file():result['missing'].append(name)
   elif sha(target)!=digest:result['mismatched'].append(name)
  manifests.append(result)
